@@ -1,24 +1,41 @@
 import React, { Component } from 'react'
-import { TextField, FlatButton } from 'material-ui';
+import { TextField, FlatButton } from 'material-ui'
 
+const API_URL = 'https://poniedzialek-ab82f.firebaseio.com'
 
 class App extends Component {
 
   state = {
-    tasks: [
-      { taskName: 'Odkurzanie', completed: false },
-      { taskName: 'Nakarmic kota', completed: false }
-    ],
+    tasks: [],
     taskName: ''
   }
   handleChange = (event) => {
     this.setState({ taskName: event.target.value })
   }
+  componentDidMount(){
+    fetch(`${API_URL}/tasks.json`)
+      .then(response => response.json())
+      .then(data => {
+        const array = Object.entries(data)
+        const taskList = array.map(([id, values]) =>{
+          values.id = id;
+          return values;
+        })
+        
+        this.setState({ task: taskList })
+      })
+  }
   handleClick = (event) => {
     if (this.state.taskName !== '') {
       let tasks = this.state.tasks;
-      tasks.push({ taskName: this.state.taskName, completed: false })
-      this.setState({ tasks, taskName: '' })
+      const newTask = { taskName: this.state.taskName, completed: false }
+      fetch(`${API_URL}/tasks.json`, {
+        method: 'POST',
+        body: JSON.stringify(newTask)
+      }).then(() => {
+        tasks.push({ taskName: this.state.taskName, completed: false })
+        this.setState({ tasks, taskName: '' })
+      })
     }
   }
   render() {
