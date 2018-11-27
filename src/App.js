@@ -22,18 +22,21 @@ class App extends Component {
           return values;
         })
         
-        this.setState({ task: taskList })
+        this.setState({ tasks: taskList })
       })
   }
   handleClick = (event) => {
     if (this.state.taskName !== '') {
       let tasks = this.state.tasks;
-      const newTask = { taskName: this.state.taskName, completed: false }
+      let newTask = { taskName: this.state.taskName, completed: false }
       fetch(`${API_URL}/tasks.json`, {
         method: 'POST',
         body: JSON.stringify(newTask)
-      }).then(() => {
-        tasks.push({ taskName: this.state.taskName, completed: false })
+      })
+      .then(response => response.json())
+      .then((data) => {
+        newTask.id = data.name
+        tasks.push(newTask)
         this.setState({ tasks, taskName: '' })
       })
     }
@@ -50,7 +53,10 @@ class App extends Component {
         </div>
         <div>
           {this.state.tasks.map((task, index) => (
-            <div>{task.taskName}</div>
+            <div
+            key={task.id}>
+            {task.taskName}
+            </div>
           ))}
         </div>
 
