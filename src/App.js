@@ -27,7 +27,7 @@ class App extends Component {
             <FlatButton label="Add" primary={true} onClick={this.handleClick} />
         </div>
         <div>
-          {this.state.task.map((task, index) => (
+          {this.state.tasks.map((task, index) => (
             <div>{task.taskName}</div>
           ))}
         </div>
