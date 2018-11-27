@@ -1,5 +1,9 @@
 import React, { Component } from 'react'
-import { TextField, FlatButton } from 'material-ui'
+import { TextField, FlatButton, IconButton, } from 'material-ui'
+import { List, ListItem } from 'material-ui/List'
+import Checkbox from 'material-ui/Checkbox'
+import DeleteIcon from 'material-ui/svg-icons/action/delete';
+
 
 const API_URL = 'https://poniedzialek-ab82f.firebaseio.com'
 
@@ -12,11 +16,13 @@ class App extends Component {
   handleChange = (event) => {
     this.setState({ taskName: event.target.value })
   }
-  componentDidMount() {
+
+  loadData = () => {
     fetch(`${API_URL}/tasks.json`)
       .then(response => response.json())
       .then(data => {
         if (!data) {
+          this.setState({ tasks: [] })
           return;
         }
         const array = Object.entries(data)
@@ -27,6 +33,10 @@ class App extends Component {
 
         this.setState({ tasks: taskList })
       })
+  }
+
+  componentWillMount = () => {
+    this.loadData();
   }
   addTask = () => {
     if (this.state.taskName !== '') {
@@ -52,29 +62,53 @@ class App extends Component {
       this.addTask()
     }
   }
-  render() {
-    return (
-      <div className="App">
-        <div>
-          <TextField
-            hintText="Enter your task here"
-            value={this.state.taskName}
-            onKeyDown={this.handleKeyDown}
-            onChange={this.handleChange} />
-          <FlatButton label="Add" primary={true} onClick={this.handleClick} />
-        </div>
-        <div>
-          {this.state.tasks.map((task, index) => (
-            <div
-              key={task.id}>
-              {task.taskName}
-            </div>
-          ))}
-        </div>
-
-      </div>
-    )
+  handleDelete = (id) => {
+    fetch(`${API_URL}/tasks/${id}.json`, {
+      method: 'DELETE'
+    })
+      .then(() => {
+        this.loadData()
+      })
   }
+  handleCheck = (task) => {
+    task.completed = !task.completed;
+    fetch(`${API_URL}/tasks/${task.id}.json`, {
+      method: 'PUT',
+      body: JSON.stringify(task)
+    })
+}
+
+render() {
+  return (
+    <div className="App">
+      <div>
+        <TextField
+          hintText="Enter your task here"
+          value={this.state.taskName}
+          onKeyDown={this.handleKeyDown}
+          onChange={this.handleChange} />
+        <FlatButton label="Add" primary={true} onClick={this.handleClick} />
+      </div>
+      <List>
+        {this.state.tasks.map((task, index) => (
+          <ListItem
+            key={task.id}
+            primaryText={task.taskName}
+            leftCheckbox={
+            <Checkbox 
+            defaultChecked={task.completed}
+            onCheck={() => this.handleCheck(task)} />}
+            rightIconButton={
+              <IconButton>
+                <DeleteIcon onClick={() => this.handleDelete(task.id)} />
+              </IconButton>
+            }
+          />
+        ))}
+      </List>
+    </div>
+  )
+}
 }
 
 export default App
