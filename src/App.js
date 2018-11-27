@@ -12,20 +12,23 @@ class App extends Component {
   handleChange = (event) => {
     this.setState({ taskName: event.target.value })
   }
-  componentDidMount(){
+  componentDidMount() {
     fetch(`${API_URL}/tasks.json`)
       .then(response => response.json())
       .then(data => {
+        if (!data) {
+          return;
+        }
         const array = Object.entries(data)
-        const taskList = array.map(([id, values]) =>{
+        const taskList = array.map(([id, values]) => {
           values.id = id;
           return values;
         })
-        
+
         this.setState({ tasks: taskList })
       })
   }
-  handleClick = (event) => {
+  addTask = () => {
     if (this.state.taskName !== '') {
       let tasks = this.state.tasks;
       let newTask = { taskName: this.state.taskName, completed: false }
@@ -33,17 +36,20 @@ class App extends Component {
         method: 'POST',
         body: JSON.stringify(newTask)
       })
-      .then(response => response.json())
-      .then((data) => {
-        newTask.id = data.name
-        tasks.push(newTask)
-        this.setState({ tasks, taskName: '' })
-      })
+        .then(response => response.json())
+        .then((data) => {
+          newTask.id = data.name
+          tasks.push(newTask)
+          this.setState({ tasks, taskName: '' })
+        })
     }
   }
+  handleClick = () => {
+    this.addTask()
+  }
   handleKeyDown = event => {
-    if (event.keyCode === 13){
-      this.handleClick()
+    if (event.keyCode === 13) {
+      this.addTask()
     }
   }
   render() {
@@ -60,8 +66,8 @@ class App extends Component {
         <div>
           {this.state.tasks.map((task, index) => (
             <div
-            key={task.id}>
-            {task.taskName}
+              key={task.id}>
+              {task.taskName}
             </div>
           ))}
         </div>
