@@ -6,25 +6,30 @@ class App extends Component {
 
   state = {
     tasks: [
-      {taskName: 'Odkurzanie', completed: false},
-      {taskName: 'Nakarmic kota', completed: false}
+      { taskName: 'Odkurzanie', completed: false },
+      { taskName: 'Nakarmic kota', completed: false }
     ],
     taskName: ''
   }
-  handleChange= (event) => {
+  handleChange = (event) => {
     this.setState({ taskName: event.target.value })
   }
-  handleClick= (event) => {
-    let tasks =this.state.tasks;
-    tasks.push({ taskName: this.state.taskName, completed: false })
-    this.setState({ tasks })
+  handleClick = (event) => {
+    if (this.state.taskName !== '') {
+      let tasks = this.state.tasks;
+      tasks.push({ taskName: this.state.taskName, completed: false })
+      this.setState({ tasks, taskName: '' })
+    }
   }
   render() {
     return (
       <div className="App">
         <div>
-            <TextField hintText="Enter your task here" onChange={this.handleChange} />
-            <FlatButton label="Add" primary={true} onClick={this.handleClick} />
+          <TextField
+            hintText="Enter your task here"
+            value={this.state.taskName}
+            onChange={this.handleChange} />
+          <FlatButton label="Add" primary={true} onClick={this.handleClick} />
         </div>
         <div>
           {this.state.tasks.map((task, index) => (
