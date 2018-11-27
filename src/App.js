@@ -71,10 +71,12 @@ class App extends Component {
       })
   }
   handleCheck = (task) => {
-    task.completed = !task.completed;
     fetch(`${API_URL}/tasks/${task.id}.json`, {
-      method: 'PUT',
-      body: JSON.stringify(task)
+      method: 'PATH',
+      body: JSON.stringify({completed: !task.completed})
+    })
+    .then(() => {
+      this.loadData()
     })
 }
 
